@@ -1,5 +1,6 @@
 import pathlib
 import typing as tp
+from random import randint
 
 T = tp.TypeVar("T")
 
@@ -181,7 +182,28 @@ def solve(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.List[tp.List[str]]]:
 def check_solution(solution: tp.List[tp.List[str]]) -> bool:
     """ Если решение solution верно, то вернуть True, в противном случае False """
     # TODO: Add doctests with bad puzzles
-    pass
+    n = len(solution)
+    for i in range(n):
+        for j in range(n):
+            used = [False] * 10
+            nums = get_col(solution, (i, j))
+            for num in nums:
+                if num == "." or used[int(num)]:
+                    return False
+                used[int(num)] = True
+            used = [False] * 10
+            nums = get_row(solution, (i, j))
+            for num in nums:
+                if num == "." or used[int(num)]:
+                    return False
+                used[int(num)] = True
+            used = [False] * 10
+            nums = get_block(solution, (i, j))
+            for num in nums:
+                if num == "." or used[int(num)]:
+                    return False
+                used[int(num)] = True
+    return True
 
 
 def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
@@ -206,7 +228,17 @@ def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
     >>> check_solution(solution)
     True
     """
-    pass
+    grid = [['.'] * 9 for i in range(9)]
+    y, x = randint(0, 8), randint(0, 8)
+    grid[y][x] = '1'
+    grid = solve(grid)
+    n = 81 - N
+    while n > 0:
+        y, x = randint(0, 8), randint(0, 8)
+        if grid[y][x] != '.':
+            grid[y][x] = '.'
+            n -= 1
+    return grid
 
 
 if __name__ == "__main__":
