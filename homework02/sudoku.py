@@ -115,7 +115,7 @@ def find_empty_positions(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.Tuple[in
     n = len(grid)
     for i in range(n):
         for j in range(n):
-            if grid[i][j] == '.':
+            if grid[i][j] == ".":
                 return i, j 
     return -1, -1
 
@@ -135,15 +135,15 @@ def find_possible_values(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -
     used = [False] * 10
     a = get_row(grid, pos)
     for num in a:
-        if num != '.':
+        if num != ".":
             used[int(num)] = True
     a = get_col(grid, pos)
     for num in a:
-        if num != '.':
+        if num != ".":
             used[int(num)] = True 
     a = get_block(grid, pos)
     for num in a:
-        if num != '.':
+        if num != ".":
             used[int(num)] = True  
     for i in range(1, 10):
         if not used[i]:
@@ -171,7 +171,7 @@ def solve(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.List[tp.List[str]]]:
     if len(nums) == 0:
         return grid
     for i in nums:
-        grid[y][x] = i;
+        grid[y][x] = i
         result = solve(grid)
         if find_empty_positions(result)[0] == -1:
             return result
@@ -228,15 +228,15 @@ def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
     >>> check_solution(solution)
     True
     """
-    grid = [['.'] * 9 for i in range(9)]
+    grid = [["."] * 9 for i in range(9)]
     y, x = randint(0, 8), randint(0, 8)
-    grid[y][x] = '1'
+    grid[y][x] = "1"
     grid = solve(grid)
     n = 81 - N
     while n > 0:
         y, x = randint(0, 8), randint(0, 8)
-        if grid[y][x] != '.':
-            grid[y][x] = '.'
+        if grid[y][x] != ".":
+            grid[y][x] = "."
             n -= 1
     return grid
 
