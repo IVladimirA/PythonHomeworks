@@ -34,6 +34,12 @@ def display(grid: tp.List[tp.List[str]]) -> None:
 
 
 def group(values: tp.List[T], n: int) -> tp.List[tp.List[T]]:
+    result = []
+    for i in range(n):
+        curr = []
+        for j in range(i * n, (i + 1) * n):
+            curr.append(values[j])
+        result.append(curr)
     """
     Сгруппировать значения values в список, состоящий из списков по n элементов
 
@@ -42,7 +48,7 @@ def group(values: tp.List[T], n: int) -> tp.List[tp.List[T]]:
     >>> group([1,2,3,4,5,6,7,8,9], 3)
     [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
     """
-    pass
+    return result
 
 
 def get_row(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str]:
@@ -55,7 +61,7 @@ def get_row(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str
     >>> get_row([['1', '2', '3'], ['4', '5', '6'], ['.', '8', '9']], (2, 0))
     ['.', '8', '9']
     """
-    pass
+    return grid[pos[0]]
 
 
 def get_col(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str]:
@@ -68,7 +74,11 @@ def get_col(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str
     >>> get_col([['1', '2', '3'], ['4', '5', '6'], ['.', '8', '9']], (0, 2))
     ['3', '6', '9']
     """
-    pass
+    result = []
+    n = len(grid)
+    for i in range(n):
+        result.append(grid[i][pos[1]])
+    return result
 
 
 def get_block(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str]:
@@ -82,7 +92,13 @@ def get_block(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[s
     >>> get_block(grid, (8, 8))
     ['2', '8', '.', '.', '.', '5', '.', '7', '9']
     """
-    pass
+    result = []
+    a = pos[0] // 3
+    b = pos[1] // 3
+    for i in range(3):
+        for j in range(3):
+            result.append(grid[i + a * 3][j + b * 3])
+    return result
 
 
 def find_empty_positions(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.Tuple[int, int]]:
@@ -95,7 +111,12 @@ def find_empty_positions(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.Tuple[in
     >>> find_empty_positions([['1', '2', '3'], ['4', '5', '6'], ['.', '8', '9']])
     (2, 0)
     """
-    pass
+    n = len(grid)
+    for i in range(n):
+        for j in range(n):
+            if grid[i][j] == '.':
+                return i, j 
+    return -1, -1
 
 
 def find_possible_values(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.Set[str]:
@@ -109,7 +130,24 @@ def find_possible_values(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -
     >>> values == {'2', '5', '9'}
     True
     """
-    pass
+    result = set()
+    used = [False] * 10
+    a = get_row(grid, pos)
+    for num in a:
+        if num != '.':
+            used[int(num)] = True
+    a = get_col(grid, pos)
+    for num in a:
+        if num != '.':
+            used[int(num)] = True 
+    a = get_block(grid, pos)
+    for num in a:
+        if num != '.':
+            used[int(num)] = True  
+    for i in range(1, 10):
+        if not used[i]:
+            result.add(str(i))
+    return result
 
 
 def solve(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.List[tp.List[str]]]:
