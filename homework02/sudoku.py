@@ -116,7 +116,7 @@ def find_empty_positions(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.Tuple[in
     for i in range(n):
         for j in range(n):
             if grid[i][j] == ".":
-                return i, j 
+                return i, j
     return -1, -1
 
 
@@ -140,11 +140,11 @@ def find_possible_values(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -
     a = get_col(grid, pos)
     for num in a:
         if num != ".":
-            used[int(num)] = True 
+            used[int(num)] = True
     a = get_block(grid, pos)
     for num in a:
         if num != ".":
-            used[int(num)] = True  
+            used[int(num)] = True
     for i in range(1, 10):
         if not used[i]:
             result.add(str(i))
