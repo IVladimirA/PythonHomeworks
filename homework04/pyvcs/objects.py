@@ -11,15 +11,18 @@ from pyvcs.repo import repo_find
 
 
 def hash_object(data: bytes, fmt: str, write: bool = False) -> str:
-    header = f"blob {len(data)}\0"
-    store = header + data.decode()
-    result = hashlib.sha1(store.encode()).hexdigest()
+    header = f"{fmt} {len(data)}\0"
+    store = header.encode() + data
+    result = hashlib.sha1(store).hexdigest()
     if write:
         gitdir = repo_find(os.getcwd())
         os.makedirs(gitdir / "objects" / result[0:2], exist_ok=True)
         pathlib.Path(gitdir / "objects" / result[0:2] / result[2:]).touch()
         cur_file = open(gitdir / "objects" / result[0:2] / result[2:], "wb")
-        cur_file.write(zlib.compress(store.encode()))
+        level = -1
+        if fmt == "tree":
+            level = 1
+        cur_file.write(zlib.compress(store, level))
         cur_file.close()
     return result
 
@@ -67,7 +70,7 @@ def cat_file(obj_name: str, pretty: bool = True) -> None:
     if "GIT_DIR" not in os.environ:
         gitname = pathlib.Path(".git")
     else:
-        gitname = os.environ["GIT_DIR"]
+        gitname = pathlib.Path(os.environ["GIT_DIR"])
     fmt, data = read_object(obj_name, gitname)
     if pretty:
         print(data.decode())
