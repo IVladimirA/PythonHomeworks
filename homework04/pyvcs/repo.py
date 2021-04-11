@@ -7,7 +7,7 @@ def repo_find(workdir: tp.Union[str, pathlib.Path] = ".") -> pathlib.Path:
     if "GIT_DIR" not in os.environ:
         gitname = pathlib.Path(".git")
     else:
-        gitname = os.environ["GIT_DIR"]
+        gitname = pathlib.Path(os.environ["GIT_DIR"])
     while os.path.isdir(workdir):
         if os.path.isdir(workdir / pathlib.Path(gitname)):
             return workdir / gitname
@@ -23,7 +23,7 @@ def repo_create(workdir: tp.Union[str, pathlib.Path]) -> pathlib.Path:
     if "GIT_DIR" not in os.environ:
         gitdir = workdir / pathlib.Path(".git")
     else:
-        gitdir = workdir / os.environ["GIT_DIR"]
+        gitdir = workdir / pathlib.Path(os.environ["GIT_DIR"])
     os.mkdir(gitdir)
     os.makedirs(gitdir / "refs" / "heads")
     os.mkdir(gitdir / "refs" / "tags")
