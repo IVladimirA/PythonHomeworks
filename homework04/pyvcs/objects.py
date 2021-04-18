@@ -62,8 +62,24 @@ def read_object(sha: str, gitdir: pathlib.Path) -> tp.Tuple[str, bytes]:
 
 
 def read_tree(data: bytes) -> tp.List[tp.Tuple[int, str, str]]:
-    # PUT YOUR CODE HERE
-    ...
+    result = []
+    while len(data) > 0:
+        fmt = data[:6].decode()
+        data = data[6:]
+        if fmt == "100644":
+            data = data[1:]
+            sep_ind = data.find(b"\x00")
+            # print("Name ---", data[:sep_ind].decode())
+            # print("Hash ---", data[sep_ind + 1 : sep_ind + 21].hex())
+            result.append((100644, data[:sep_ind].decode(), data[sep_ind + 1 : sep_ind + 21].hex()))
+            data = data[sep_ind + 21 :]
+        else:
+            sep_ind = data.find(b"\x00")
+            # print("Name ---", data[:sep_ind].decode())
+            # print("Hash ---", data[sep_ind + 1 : sep_ind + 21].hex())
+            result.append((40000, data[:sep_ind].decode(), data[sep_ind + 1 : sep_ind + 21].hex()))
+            data = data[sep_ind + 21 :]
+    return result
 
 
 def cat_file(obj_name: str, pretty: bool = True) -> None:
@@ -72,15 +88,41 @@ def cat_file(obj_name: str, pretty: bool = True) -> None:
     else:
         gitname = pathlib.Path(os.environ["GIT_DIR"])
     fmt, data = read_object(obj_name, gitname)
-    if pretty:
-        print(data.decode())
+    if fmt == "blob":
+        if pretty:
+            print(data.decode())
+        else:
+            print(data)
+        return
+    elif fmt == "tree":
+        content = read_tree(data)
+        if pretty:
+            for entry in content:
+                if entry[0] == 40000:
+                    print("040000", "tree", entry[2] + "\t" + entry[1])
+                else:
+                    print("100644", "blob", entry[2] + "\t" + entry[1])
+        else:
+            for entry in content:
+                print(entry[2])
     else:
-        print(data)
+        print(data.decode())
 
 
 def find_tree_files(tree_sha: str, gitdir: pathlib.Path) -> tp.List[tp.Tuple[str, str]]:
-    # PUT YOUR CODE HERE
-    ...
+    # print("CURRENT TREE: " + tree_sha)
+    fmt, content = read_object(tree_sha, gitdir)
+    objects = read_tree(content)
+    result = []
+    for obj in objects:
+        if obj[0] == 100644 or obj[0] == 100755:
+            result.append((obj[1], obj[2]))
+        else:
+            # print("SUB_TREE: ", obj[1])
+            sub_objects = find_tree_files(obj[2], gitdir)
+            for sub_obj in sub_objects:
+                result.append((obj[1] + "/" + sub_obj[0], sub_obj[1]))
+    return result
 
 
 def commit_parse(raw: bytes, start: int = 0, dct=None):

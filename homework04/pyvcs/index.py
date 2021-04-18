@@ -127,6 +127,7 @@ def update_index(gitdir: pathlib.Path, paths: tp.List[pathlib.Path], write: bool
         fileinfo = os.stat(path)
         f = open(path, "r")
         data = f.read()
+        f.close()
         sha = hashlib.sha1((f"blob {len(data)}\0" + data).encode())
         new_entry = GitIndexEntry(
             int(fileinfo.st_ctime),
