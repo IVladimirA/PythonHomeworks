@@ -48,7 +48,6 @@ def get_ref(gitdir: pathlib.Path) -> str:
     f = open(gitdir / "HEAD", "r")
     ref = f.read()
     f.close()
-    ref = ref[:-1]
     if ref[:5] == "ref: ":
-        ref = ref[5:]
+        ref = ref[5:-1]
     return ref
